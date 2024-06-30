@@ -1,8 +1,10 @@
-from fastapi import FastAPI
-import uvicorn
-from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+
+import uvicorn
+from fastapi import FastAPI
 from fastapi.logger import logger
+from fastapi.staticfiles import StaticFiles
+
 import settings
 # import pipreqs
 
@@ -15,6 +17,7 @@ import settings
 # TODO: Find an alternative to Jira x Github integration for "TODO's"
 # labels: enhancement
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     if settings.DEVELOPER:
@@ -23,11 +26,12 @@ async def lifespan(app: FastAPI):
     # Each component is responsible for a different part of the server and SOLEY that part
     # This is to make sure that the server is modular and easy to maintain
     # If a component is making multiple responsibilities, then it should be split into multiple components 👍
-    import frontend # Responsible for being the "GUI" for the user
-    import osu_client # Responsible for capturing and processing requests from the osu! client and redirecting them to the according components
-                      # Also responsible for managing the osu! client
-    import api # Responsible for retriving and processing information for the sake of manging the sqlite db of the server
-    import local_data_fetcher # Responsible for fetching local data from the user's computer
+    import frontend  # Responsible for being the "GUI" for the user
+    import osu_client  # Responsible for capturing and processing requests from the osu! client and redirecting them to the according components
+
+    # Also responsible for managing the osu! client
+    import api  # Responsible for retriving and processing information for the sake of manging the sqlite db of the server
+    import local_data_fetcher  # Responsible for fetching local data from the user's computer
 
     app.include_router(frontend.web_client_router)
     app.include_router(osu_client.bancho_handling_router)
@@ -39,11 +43,11 @@ async def lifespan(app: FastAPI):
     # static is the default folder that fastapi uses for grabbing
     # javascript and css files
 
-    web_path_for_css_and_javascript_files = '/static'
+    web_path_for_css_and_javascript_files = "/static"
     app.mount(
         web_path_for_css_and_javascript_files,
-        StaticFiles(directory='./app/server/frontend/static'),
-        name='static'
+        StaticFiles(directory="./app/server/frontend/static"),
+        name="static",
     )
 
     # TODO: Add an easier method of connecting without mitmproxy
@@ -53,6 +57,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/")
 def root():

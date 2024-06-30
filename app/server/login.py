@@ -1,5 +1,4 @@
-from typing import TypedDict, cast
-
+from typing import TypedDict
 
 class LoginData(TypedDict):
     username: str
