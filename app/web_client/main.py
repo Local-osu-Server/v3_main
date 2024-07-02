@@ -6,7 +6,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 import constants
-import settings as settings
+import settings
 
 os.environ["WDM_SSL_VERIFY"] = "0"
 
