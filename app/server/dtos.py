@@ -22,7 +22,7 @@ class SessionDTO(TypedDict):
     longitude: float
     latitude: float
     timezone: int
-    info_text: int
+    info_text: str
     beatmap_md5: str
     beatmap_id: int
 

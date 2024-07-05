@@ -1,4 +1,5 @@
-class GameMode:
+from enum import IntEnum
+class GameMode(IntEnum):
     VN_OSU = 0
     VN_TAIKO = 1
     VN_CATCH = 2

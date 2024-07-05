@@ -14,17 +14,17 @@ class Accounts(SQLModel, table=True):
 
 class Sessions(SQLModel, table=True):
     user_id: int = Field(primary_key=True, index=True)
-    session_id: UUID = Field(default_factory=uuid4)
+    session_id: str # casted UUID
     username: str
     action: int
     rank: int
     country: int
     mods: int
-    gamemode: int
+    gamemode: int = Field(default=GameMode.VN_OSU)
     longitude: float
     latitude: float
     timezone: int
-    info_text: int
+    info_text: str
     beatmap_md5: str
     beatmap_id: int
 
@@ -41,7 +41,7 @@ class Stats(SQLModel, table=True):
 
 
 
-assert settings.SQLLITE_FILE_NAME.endswith(".db")
+assert not settings.SQLLITE_FILE_NAME.endswith(".db")
 
 sqlite_file_name = f"{settings.SQLLITE_FILE_NAME}.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
