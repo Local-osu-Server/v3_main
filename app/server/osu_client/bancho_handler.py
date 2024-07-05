@@ -3,40 +3,53 @@ from fastapi.responses import JSONResponse
 from fastapi import Request, Response
 from fastapi import Header, Depends
 from uuid import uuid4
-
+from fastapi import status
+from app.server.dtos import AccountDTO, SessionDTO, StatsDTO
+from app.server.repositories import queries
 import app.server.login as login
 from app.server.login import LoginData
+from app.server import database
+from app.server.gamemodes import GameMode
+import packets
 
 bancho_handling_router = APIRouter(default_response_class=Response, prefix="/c")
 
 
 @bancho_handling_router.post("/")
 async def handle_request(request: Request):
-    print(request.headers)
     if "osu_token" not in request.headers:
         response = await handle_login(request)
 
-    print("================================")
-    return response if response else False
-    # else:
-    #     TODO response = implement bancho request handler
-    # return response
+    else:
+        # TODO response = implement bancho request handler
+        ...
+    return response
 
 
 async def handle_login(request: Request):
-    raw_login_data = await request.body()
 
-    login_data: LoginData = login.parse_login(raw_login_data)
+    # Creates database (move somewhere else)
+    database.configure_database()
 
+    try:
+        login_data: LoginData = login.parse_login(await request.body())
+    except Exception as e:
+        print(f"ERROR HANDLING LOGIN: {e}")
 
-    # import hashlib
-    # hashlib.md5()
-    # verify login
+    account_query_result = queries.fetch_account_by_username(username=login_data["username"])
+
+    if account_query_result is None:
+        account: AccountDTO = queries.create_account(login_data["username"])
+        queries.create_stats(account["user_id"])
+    else:
+        account: AccountDTO = account_query_result
+
+    stats = queries.fetch_stats(account["user_id"])
 
     response = bytearray()
 
-'''
-if user not exist -> CREATE new account
-'''
 
-    # TODO: Finish Everything Related To Send Packets to the Player
+
+
+
+

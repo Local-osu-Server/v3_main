@@ -2,7 +2,7 @@ import struct
 from enum import IntEnum
 
 
-class PacketIDS(IntEnum):
+class ServerPackets(IntEnum):
     OSU_CHANGE_ACTION = 0
     OSU_SEND_PUBLIC_MESSAGE = 1
     OSU_LOGOUT = 2
@@ -216,30 +216,30 @@ def write(packet_id: int, *args) -> bytes:
     return bytes(p)
 
 
-def user_id(i: int) -> bytes:
+def write_user_id(i: int) -> bytes:
     return write(
-        PacketIDS.CHO_USER_ID,
+        ServerPackets.CHO_USER_ID,
         (i, f"{PacketType.U_INT if i > 0 else PacketType.INTEGER}"),
     )
 
 
-def notification(msg: str) -> bytes:
-    return write(PacketIDS.CHO_NOTIFICATION, (msg, PacketType.STRING))
+def write_notification(msg: str) -> bytes:
+    return write(ServerPackets.CHO_NOTIFICATION, (msg, PacketType.STRING))
 
 
-def protocol_version(i: int = 19):
-    return write(PacketIDS.CHO_PROTOCOL_VERSION, (i, PacketType.INTEGER))
+def write_protocol_version(i: int = 19):
+    return write(ServerPackets.CHO_PROTOCOL_VERSION, (i, PacketType.INTEGER))
 
 
 # TODO implement "Player" typedict
-def bancho_orivs(**kwargs) -> bytes:
-    return write(PacketIDS.CHO_PRIVILEGES,
+def write_bancho_orivs(**kwargs) -> bytes:
+    return write(ServerPackets.CHO_PRIVILEGES,
                 (kwargs["bancho_privs"], PacketType.INTEGER))
 
 
-def user_presence(**kwargs) -> bytes:
+def write_user_presence(**kwargs) -> bytes:
     return write(
-        PacketIDS.CHO_USER_PRESENCE,
+        ServerPackets.CHO_USER_PRESENCE,
         (kwargs["userid"], PacketType.INTEGER),
         (kwargs["name"], PacketType.STRING),
         (kwargs["utc_offset"] + 24, PacketType.U_BYTE),
@@ -251,9 +251,9 @@ def user_presence(**kwargs) -> bytes:
     )
 
 
-def user_stats(**kwargs) -> bytes:
+def write_user_stats(**kwargs) -> bytes:
     return write(
-        PacketIDS.CHO_USER_STATS,
+        ServerPackets.CHO_USER_STATS,
         (kwargs["userid"], PacketType.INTEGER),
         (kwargs["action"], PacketType.BYTE),
         (kwargs["info_text"], PacketType.STRING),
@@ -270,47 +270,54 @@ def user_stats(**kwargs) -> bytes:
     )
 
 
-def menu_icon(menu_icon: tuple[str, str]) -> bytes:
-    return write(PacketIDS.CHO_MAIN_MENU_ICON, ("|".join(menu_icon), PacketType.STRING))
+def write_menu_icon(menu_icon: tuple[str, str]) -> bytes:
+    return write(ServerPackets.CHO_MAIN_MENU_ICON, ("|".join(menu_icon), PacketType.STRING))
 
 
-def friends_list(*friends: int) -> bytes:
-    return write(PacketIDS.CHO_FRIENDS_LIST, (friends, PacketType.LIST_32))
+def write_friends_list(*friends: int) -> bytes:
+    return write(ServerPackets.CHO_FRIENDS_LIST, (friends, PacketType.LIST_32))
 
 
-def channel_info_end() -> bytes:
-    return write(PacketIDS.CHO_CHANNEL_INFO_END)
+def write_channel_info_end() -> bytes:
+    return write(ServerPackets.CHO_CHANNEL_INFO_END)
 
 
-def channelJoin(channel_name: str) -> bytes:
-    return write(PacketIDS.CHO_CHANNEL_JOIN_SUCCESS, (channel_name, PacketType.STRING))
+def write_channelJoin(channel_name: str) -> bytes:
+    return write(ServerPackets.CHO_CHANNEL_JOIN_SUCCESS, (channel_name, PacketType.STRING))
 
 
-def channel_info(
+def write_channel_info(
     channel_name: str, channel_description: str, channel_player_count: int
 ) -> bytes:
     return write(
-        PacketIDS.CHO_CHANNEL_INFO,
+        ServerPackets.CHO_CHANNEL_INFO,
         (channel_name, PacketType.STRING),
         (channel_description, PacketType.STRING),
         (channel_player_count, PacketType.SHORT),
     )
 
 
-def system_restart(ms: int = 0) -> bytes:
-    return write(PacketIDS.CHO_RESTART, (ms, PacketType.INTEGER))
+def write_system_restart(ms: int = 0) -> bytes:
+    return write(ServerPackets.CHO_RESTART, (ms, PacketType.INTEGER))
 
 
-from uuid import UUID
-def logout(uuid: UUID) -> bytes:
+def write_login(user_id: int) -> bytes:
     return write(
-        PacketIDS.CHO_USER_LOGOUT, (uuid, PacketType.INTEGER), (0, PacketType.U_BYTE)
+        ServerPackets.CHO_USER_ID,
+        (PacketType.INTEGER, user_id)
     )
 
 
-def send_message(client: str, msg: str, target: str, userid: int):
+from uuid import UUID
+def write_logout(uuid: UUID) -> bytes:
     return write(
-        PacketIDS.CHO_SEND_MESSAGE,
+        ServerPackets.CHO_USER_LOGOUT, (uuid, PacketType.INTEGER), (0, PacketType.U_BYTE)
+    )
+
+
+def write_send_message(client: str, msg: str, target: str, userid: int):
+    return write(
+        ServerPackets.CHO_SEND_MESSAGE,
         (client, PacketType.STRING),
         (msg, PacketType.STRING),
         (target, PacketType.STRING),
@@ -318,5 +325,5 @@ def send_message(client: str, msg: str, target: str, userid: int):
     )
 
 
-def user_silenced(userid: int) -> bytes:
-    return write(PacketIDS.CHO_USER_SILENCED, (userid, PacketType.INTEGER))
+def write_user_silenced(userid: int) -> bytes:
+    return write(ServerPackets.CHO_USER_SILENCED, (userid, PacketType.INTEGER))

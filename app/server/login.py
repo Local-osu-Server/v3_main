@@ -2,7 +2,7 @@ from typing import TypedDict
 
 class LoginData(TypedDict):
     username: str
-    password_md5: str
+    # password_md5: str NOT USED
     client_version: str
     timezone: int
     location: int
@@ -18,7 +18,6 @@ def parse_login(data: bytes) -> LoginData:
 
     login_data: LoginData = {
         "username": username,
-        "password_md5": password_md5,
         "client_version": client_version,
         "timezone": int(timezone),
         "location": int(location),

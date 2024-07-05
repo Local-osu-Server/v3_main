@@ -20,9 +20,7 @@ env["PYTHONPATH"] = os.environ.get("PYTHONPATH", '') + ":" + project_path
 
 script_path = os.path.join(project_path, "app/server/main.py")
 
-python_command = find_python_command()
-
 try:
-    subprocess.run([python_command, script_path], check=True, env=env)
+    subprocess.run([find_python_command(), script_path], check=True, env=env)
 except Exception as e:
     print(f"Error: {e}")
